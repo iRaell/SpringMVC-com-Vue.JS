@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Cadastro</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- production version, optimized for size and speed -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+  </head>
+  <body>
+
+
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Início <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Contato <span class="sr-only">(current)</span></a>
+              </li>
+              
+              
+            </ul>
+            
+          </div>
+        </nav>
+
+
+
+
+
+ <div id ="app"> 
+
+    <form class="form-control">
+
+    <div class="form-group">
+    <label>Nome:</label>
+    <input type="text" placeholder=" Digite seu Nome..." v-model="usuario.nome">
+    </div>
+
+    <div class="form-group">
+    <label>E-mail:</label>
+    <input type="text" placeholder=" Digite seu E-mail" v-model="usuario.email">
+    </div>
+
+    <div class="form-group">
+    <label>Senha:</label>
+    <input type="password" placeholder=" Digite sua Senha..." v-model="usuario.senha">
+    </div>
+
+  <div class="form-group">
+        <label>Perfil:</label>
+    <select v-model="usuario.perfil">
+      <option disabled >.:Escolha:.</option>
+      <option v-for="p in perfils" v-bind:value="p">{{p.descricao}}</option>      
+    </select>
+  </div>
+
+    <div class="form-group">
+    <button type="button" v-on:click="novo">Novo</button>
+    <button type="button" v-on:click="salvar">Salvar</button>
+    </div>
+
+  </form>
+  
+   
+
+      <div class="container">
+          <div class="row">
+            <div class="col-sm">
+            <h5>Id</h5> 
+            </div>
+            <div class="col-sm">
+             <h5>Nome</h5>
+            </div>
+            <div class="col-sm">
+             <h5>E-mail</h5>
+            </div>
+             <div class="col-sm">
+              <h5>Perfil</h5>
+            </div>
+             <div class="col-sm">
+             
+            </div>
+          </div>
+
+<div class="container">
+     <div class="row" style="list-style-type: none"  v-for="usuario in usuarios">
+     
+       <div class="col">
+        {{ usuario.id }} 
+       </div>
+       <div class="col">
+        {{ usuario.nome }}
+      </div>
+      <div class="col">
+        {{ usuario.email }}
+      </div>
+      <div class="col">
+        {{ usuario.perfil }} 
+      </div>
+      
+      <div class="col">
+        <button type="button"class="btn btn-outline-primary" v-on:click="alterar(usuario)">Editar</button>
+        <button type="button" class="btn btn-outline-danger" v-on:click="excluir(usuario)">Excluir</button>
+      </div>
+     </div>     
+  </div>
+   
+ </div>  
+
+
+      
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+
+  </body>
+
+
+   <script>
+   var app = new Vue({
+           el: '#app', 
+           data: {
+             usuarios:[],
+             usuario:{nome:'', email:'', senha:''},
+             perfils:[]
+
+           },
+
+           created: function(){
+                this.$http.get("http://localhost:8080/usucontroller").then(function (response){
+
+                    this.usuarios=response.body;
+
+                }, function (response){
+                  console.log("Não funciona...")
+
+                })   
+
+                 this.$http.get("http://localhost:8080/perfilcontroller").then(function (response){
+
+                    this.perfils = response.body;
+
+                }, function (response){
+                  console.log("Não funciona...")
+
+                })                           
+
+           },
+
+           methods:{
+              salvar: function(){
+                   if(this.usuario.id ==""){
+
+                this.$http.post("http://localhost:8080/usucontroller/",this.usuario).then(function (response){
+                         
+                  this.usuarios.push(response.body);
+                  
+                 
+                  }, function (response){
+                   console.log("Não funciona...")
+
+                     })     
+                 
+              } else {
+                this.$http.put("http://localhost:8080/usucontroller/", this.usuario).then(function (response){
+
+                  index =  this.usuarios.indexOf(this.usuarioAlterar);
+
+                  this.usuarios.splice(index, 1, response.body)
+
+                  this.usuario = {id:'' , nome:'', email:'', senha:''}
+
+                  }, function (response){
+                  console.log("Não funciona...")
+
+                   })               
+                    }
+                },
+              
+                 excluir: function(usuarioExcluir){
+                   if (window.confirm("Tem certeza que deseja excluir o usuário? "+ usuarioExcluir.nome+ " ")){
+                this.$http.delete("http://localhost:8080/usucontroller/"+ usuarioExcluir.id).then(function (response){
+
+                  var indice = this.usuarios.indexOf(usuarioExcluir);
+                  this.usuarios.splice(indice,1);
+
+                  this.usuario = {id: '' , nome:'', email:'', senha:''}
+
+                  }, function (response){
+                   console.log("Não funciona...")
+                  })
+                   }                 
+           },
+
+           alterar: function(usuarioAlterar){
+             this.usuarioAlterar = usuarioAlterar;
+             this.usuario = Vue.util.extend({}, usuarioAlterar);
+            
+       },
+       novo: function(){
+         this.usuario = {id:'',nome:'',email:'',senha:''}
+       }
+   }
+
+       });  
+   
+   
+   
+   </script>
+
+
+
+</html>
